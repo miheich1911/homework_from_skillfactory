@@ -1,6 +1,5 @@
 class Dot:
-    x = None
-    y = None
+    
 
     def __init__(self, x, y):
         self.x = x          # столбец
@@ -12,8 +11,7 @@ class Dot:
         return False
 
 class Ship:
-    nose = None
-    size = None
+    
 
     def __init__(self, size, nose, direction):
         self.size = size
