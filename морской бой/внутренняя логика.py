@@ -29,20 +29,6 @@ class Board():
     def __init__(self, hid):
         self.hid = hid                                # типа bool, нужно скрывать доску(для врага) или нет(для себя)
 
-    # def add_ships(self, ship):
-    #     list_ships = []                               # список кораблей
-    #     num_sur = 0                                   # количество живых кораблей
-    #     for dot in ship.dots():
-    #         if dot.out() is True or dot in ship.contour() or dot in ship.dots():
-    #             raise Exception("Невозможно поставить корабль на это место")
-    #         else:
-    #             continue
-    #     list_ships.append(ship)
-    #     num_sur += 1
-    #     return list_ships
-
-
-
     def add_ship(self, field, ship, list_ships):
         field = [['0'] * 6 for i in range(6)]
         list_ships = []                               # список кораблей
@@ -52,7 +38,7 @@ class Board():
             if self.out(dot) or dot in self.contour(Ship) or dot in Ship.dots:
                 raise Exception("Невозможно поставить корабль на это место")
             else:
-                ship.append(dot)
+                continue
         list_ships.append(ship)
         field.append(list_ships)
         num_sur += 1
