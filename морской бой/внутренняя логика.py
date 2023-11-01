@@ -40,7 +40,6 @@ class Board():
         occupied_points = []
         for dot in ship.dots():
             ship_constructor = []
-            # если точка за пределами поля, или попадает в контур другого корабля, или совпадает с точкой другого корабля
             if self.out(dot) or dot in occupied_points:
                 raise Exception("Невозможно поставить корабль на это место")
             else:
