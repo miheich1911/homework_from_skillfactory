@@ -26,7 +26,7 @@ class Ship:
         return ship_dots
 
 class Board():
-    def __init__(self, hid, field, list_ships, num_sur, occupied_points):
+    def __init__(self, hid):
         self.hid = hid
         self.field = [['0'] * 6 for i in range(6)]
         self.list_ships = []
@@ -37,7 +37,8 @@ class Board():
         for dot in ship.dots():
             if self.out(dot) or dot in self.occupied_points:
                 raise Exception("Невозможно поставить корабль на это место")
-        self.field[dot.x - 1][dot.y - 1] = '■'
+        for dot in ship.dots():
+            self.field[dot.x - 1][dot.y - 1] = '■'
         self.occupied_points.append(ship.dots())
         self.occupied_points.append(self.contour(ship))
         self.list_ships.append(ship)
@@ -62,8 +63,8 @@ class Board():
         return False
 
     def shot(self, dot):
+        shot_dot = dot(x=int(input('Введите координату X выстрела:')), y=int(input('Введите координату Y выстрела:')))
         try:
-            shot_dot = dot(x = int(input('Введите координату X выстрела:')), y = int(input('Введите координату Y выстрела:')))
             if shot_dot == '■':
                 shot_dot = 'X'
             else:
