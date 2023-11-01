@@ -27,10 +27,10 @@ class Ship:
 
 class Board():
     def __init__(self, hid, field, list_ships, num_sur):
-        self.hid = hid                                      # типа bool, нужно скрывать доску(для врага) или нет(для себя)
+        self.hid = hid
         self.field = field
-        self.list_ships = list_ships               # список кораблей
-        self.num_sur = num_sur                        # количество живых кораблей
+        self.list_ships = list_ships
+        self.num_sur = num_sur
 
 
     def add_ship(self, dot, ship):
