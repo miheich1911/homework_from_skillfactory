@@ -52,6 +52,7 @@ class Board():
                 occupied_points.append(self.contour(ship))
             self.list_ships.append(ship)
             self.num_sur += 1
+            return self.list_ships, self.num_sur
         return self.field
 
     def contour(self, ship):
