@@ -26,26 +26,20 @@ class Ship:
         return ship_dots
 
 class Board():
-    def __init__(self, hid, field, list_ships, num_sur):
+    def __init__(self, hid, field, list_ships, num_sur, occupied_points):
         self.hid = hid
-        self.field = field
-        self.list_ships = list_ships
-        self.num_sur = num_sur
-
-
-    def add_ship(self, dot, ship):
         self.field = [['0'] * 6 for i in range(6)]
         self.list_ships = []
         self.num_sur = 0
-        occupied_points = []
+        self.occupied_points = []
+
+    def add_ship(self, dot, ship):
         for dot in ship.dots():
-            if self.out(dot) or dot in occupied_points:
+            if self.out(dot) or dot in self.occupied_points:
                 raise Exception("Невозможно поставить корабль на это место")
-            else:
-                continue
         self.field[dot.x - 1][dot.y - 1] = '■'
-        occupied_points.append(dot)
-        occupied_points.append(self.contour(ship))
+        self.occupied_points.append(ship.dots())
+        self.occupied_points.append(self.contour(ship))
         self.list_ships.append(ship)
         self.num_sur += 1
         return self.list_ships, self.num_sur, self.field
