@@ -26,32 +26,42 @@ class Ship:
         return ship_dots
 
 class Board():
-    def __init__(self, hid):
+    def __init__(self, hid, field, list_ships, num_sur):
         self.hid = hid                                # типа bool, нужно скрывать доску(для врага) или нет(для себя)
+        self.field = field
+        self.list_ships = list_ships                  # список кораблей
+        self.num_sur = num_sur                        # количество живых кораблей
 
-    def add_ship(self, field, ship, list_ships):
-        field = [['0'] * 6 for i in range(6)]
-        list_ships = []                               # список кораблей
-        num_sur = 0                                   # количество живых кораблей
+
+    def add_ship(self, dot, ship):
+        self.field = [['0'] * 6 for i in range(6)]
+        self.list_ships = []
+        self.num_sur = 0
+        occupied_points = []
         for dot in ship.dots():
+            ship_constructor = []
             # если точка за пределами поля, или попадает в контур другого корабля, или совпадает с точкой другого корабля
-            if self.out(dot) or dot in self.contour(Ship) or dot in Ship.dots:
+            if self.out(dot) or dot in occupied_points:
                 raise Exception("Невозможно поставить корабль на это место")
             else:
-                continue
-        list_ships.append(ship)
-        field.append(list_ships)
-        num_sur += 1
-        return field
+                ship_constructor.append(dot)
+            if ship_constructor != ship:
+                raise Exception("Невозможно поставить корабль на это место")
+            else:
+                dot = '■'
+                occupied_points.append(ship)
+                occupied_points.append(self.contour(ship))
+            self.list_ships.append(ship)
+            self.num_sur += 1
+        return self.field
 
-    
     def contour(self, ship):
         contour_ship = []
         for dot in ship.dots():
             for i in range(-1, 1):
                 for j in range(-1, 1):
-                    contour_dot = dot(x + i, y + j)
-                    if contour_dot.out() is True or contour_dot in ship.dots():
+                    contour_dot = Dot(dot.x + i, dot.y + j)
+                    if self.out(contour_dot) or contour_dot in ship.dots():
                         continue
                     else:
                         contour_ship.append(contour_dot)
@@ -74,3 +84,4 @@ class Board():
 
 
     def print_board(self):
+        if self.hid is True:
