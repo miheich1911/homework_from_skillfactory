@@ -48,8 +48,8 @@ class Board():
                 raise Exception("Невозможно поставить корабль на это место")
             else:
                 self.field[dot.x - 1][dot.y - 1] = '■'
-                occupied_points.append(ship)
-                occupied_points.append(self.contour(ship))
+            occupied_points.append(ship)
+            occupied_points.append(self.contour(ship))
             self.list_ships.append(ship)
             self.num_sur += 1
             return self.list_ships, self.num_sur
