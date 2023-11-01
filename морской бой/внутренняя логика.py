@@ -27,9 +27,9 @@ class Ship:
 
 class Board():
     def __init__(self, hid, field, list_ships, num_sur):
-        self.hid = hid                                # типа bool, нужно скрывать доску(для врага) или нет(для себя)
+        self.hid = hid                                      # типа bool, нужно скрывать доску(для врага) или нет(для себя)
         self.field = field
-        self.list_ships = list_ships                  # список кораблей
+        self.list_ships = list_ships               # список кораблей
         self.num_sur = num_sur                        # количество живых кораблей
 
 
@@ -39,21 +39,16 @@ class Board():
         self.num_sur = 0
         occupied_points = []
         for dot in ship.dots():
-            ship_constructor = []
             if self.out(dot) or dot in occupied_points:
                 raise Exception("Невозможно поставить корабль на это место")
             else:
-                ship_constructor.append(dot)
-            if ship_constructor != ship:
-                raise Exception("Невозможно поставить корабль на это место")
-            else:
-                self.field[dot.x - 1][dot.y - 1] = '■'
-            occupied_points.append(ship)
-            occupied_points.append(self.contour(ship))
-            self.list_ships.append(ship)
-            self.num_sur += 1
-            return self.list_ships, self.num_sur
-        return self.field
+                continue
+        self.field[dot.x - 1][dot.y - 1] = '■'
+        occupied_points.append(dot)
+        occupied_points.append(self.contour(ship))
+        self.list_ships.append(ship)
+        self.num_sur += 1
+        return self.list_ships, self.num_sur, self.field
 
     def contour(self, ship):
         contour_ship = []
@@ -81,7 +76,3 @@ class Board():
                 shot_dot = 'T'
         except IndexError:
             print('Вы выстрелили за пределы доски!')
-
-
-    def print_board(self):
-        if self.hid is True:
