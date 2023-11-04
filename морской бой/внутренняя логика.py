@@ -68,11 +68,11 @@ class Board():
             if shot_dot == '■':
                 shot_dot = 'X'
                 print('Попал!')
-                ship.size -=1
+                ship.hp -=1
             else:
                 shot_dot = 'T'
                 print('Мимо!')
-            if ship.size == 0:
+            if ship.hp == 0:
                 for dot in ship.contour():
                     dot = 'T'
                 print('Убит!')
