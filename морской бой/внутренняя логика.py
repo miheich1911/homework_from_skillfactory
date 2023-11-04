@@ -68,7 +68,7 @@ class Board():
             if shot_dot == '■':
                 shot_dot = 'X'
                 print('Попал!')
-                ship.hp -=1
+                ship.hp -= 1
             else:
                 shot_dot = 'T'
                 print('Мимо!')
@@ -84,3 +84,6 @@ class Board():
         print(" |1|2|3|4|5|6")
         for i, row in enumerate(self.field, start=1):
             print(i, *row, sep='|')
+
+
+
