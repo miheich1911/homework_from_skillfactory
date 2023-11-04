@@ -33,13 +33,13 @@ class Board():
         self.num_sur = 0
         self.occupied_points = []
 
-    def add_ship(self, dot, ship):
+    def add_ship(self, ship):
         for dot in ship.dots():
             if self.out(dot) or dot in self.occupied_points:
-                raise Exception("Невозможно поставить корабль на это место")
+                raise Exception("Невозможно поставить корабль на это место!")
         for dot in ship.dots():
             self.field[dot.x - 1][dot.y - 1] = '■'
-            self.occupied_points.append(ship.dots())
+        self.occupied_points.append(ship.dots())
         self.occupied_points.append(self.contour(ship))
         self.list_ships.append(ship)
         self.num_sur += 1
@@ -62,12 +62,25 @@ class Board():
             return True
         return False
 
-    def shot(self, dot):
-        shot_dot = dot(x=int(input('Введите координату X выстрела:')), y=int(input('Введите координату Y выстрела:')))
+    def shot(self, dot, ship):
+        shot_dot = dot(int(input('Введите номер строки для выстрела:')), int(input('Введите номер колонны для выстрела:')))
         try:
             if shot_dot == '■':
                 shot_dot = 'X'
+                print('Попал!')
+                ship.size -=1
             else:
                 shot_dot = 'T'
+                print('Мимо!')
+            if ship.size == 0:
+                for dot in ship.contour():
+                    dot = 'T'
+                print('Убит!')
         except IndexError:
             print('Вы выстрелили за пределы доски!')
+
+
+    def print_board(self):
+        print(" |1|2|3|4|5|6")
+        for i, row in enumerate(self.field, start=1):
+            print(i, *row, sep='|')
