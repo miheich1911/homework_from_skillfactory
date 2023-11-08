@@ -158,29 +158,34 @@ class Game:
             if self.user_board.list_ships == 0:
                 print('Поражение:( Компьютер победил:(')
                 return
-            if not self.ai.move:
+            if not self.ai.move():
                 break
         while True:
             if self.ai_board.list_ships == 0:
                 print('Поздравляем! Вы победили!:)')
                 return
-            if not self.user.move:
+            if not self.user.move():
                 break
 
 
     def random_board(self):
         board = Board(False)
         size = [3, 2, 2, 1, 1, 1, 1]
-        for i in size:
-            x = random.randint(1, 6)
-            y = random.randint(1, 6)
-            direction = random.choice(['H', 'V'])     #горизонтальное и вертикальное
-            ship = Ship(i, Dot(x, y), direction)
-            board.list_ships.append(ship)
-            board.num_sur += 1
-            if board.add_ship(ship):
-                continue
+        count = 0
+        if count < 1000:
+            for i in size:
+                x = random.randint(1, 6)
+                y = random.randint(1, 6)
+                direction = random.choice(['H', 'V'])     #горизонтальное и вертикальное
+                ship = Ship(i, Dot(x, y), direction)
+                try:
+                    board.add_ship(ship)
+                except:
+                    print("Невозможно поставить корабль на это место!")
+                    count += 1
+                    continue
         return board
+
 
     def start(self):
         self.greet()
@@ -192,3 +197,9 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     game.start()
+
+
+
+
+
+
