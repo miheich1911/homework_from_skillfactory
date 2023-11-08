@@ -1,3 +1,4 @@
+import random
 class Dot:
     def __init__(self, x, y):
         self.x = x          # столбец
@@ -7,6 +8,8 @@ class Dot:
         if isinstance(other, Dot):
             return self.x == other.x and self.y == other.y
         return False
+
+
 
 class Ship:
     def __init__(self, size, nose, direction):
@@ -24,6 +27,8 @@ class Ship:
                 dot_ship = Dot(self.nose.x, self.nose.y + i)
             ship_dots.append(dot_ship)
         return ship_dots
+
+
 
 class Board():
     def __init__(self, hid):
@@ -63,34 +68,127 @@ class Board():
         return False
 
     def shot(self, dot):
-        perfect_shots = []
-        if dot in perfect_shots:     #если выстрел В СПИСКЕ произведенных выстрелов
-            raise Exception("Вы уже стреляли в эту клетку! Введите корректные данные для выстрела!")
-        else:     #если выстрел НЕ В СПИСКЕ произведенных выстрелов
-            for ship in self.list_ships:     #для корябля из списка кораблей
-                if dot in ship.dots:     #если выстрел ПОПАДАЕТ в одну из точек корабля
-                    self.field[dot.x - 1][dot.y - 1] = 'X'     #точка помечается знаком 'X'
-                    ship.hp -= 1     #жизнь корабля уменьшается на 1
-                    perfect_shots.append(dot)     #выстрел записывается в список произведенных выстрелов\
+        if self.out(dot) or self.field[dot.x - 1][dot.y - 1] == 'X' or self.field[dot.x - 1][dot.y - 1] == 'T':
+            raise Exception("Введите корректные данные для выстрела!")
+        else:
+            for ship in self.list_ships:  # для корябля из списка кораблей
+                if dot in ship.dots:
+                    self.field[dot.x - 1][dot.y - 1] = 'X'
+                    ship.hp -= 1
                     print('Попал! Сделайте еще один выстрел')
-                    if ship.hp == 0:     #если корабль погибает
-                        for dot in self.contour(ship):     # для точек контура корабля
-                            self.field[dot.x - 1][dot.y - 1] = 'T'      #точки помечаются знаком 'T'
-                            self.num_sur -= 1     #счетчик живых кораблей уменьшается на 1
-                            self.list_ships.remove(ship)     #корабль удалаяется из списка кораблей
-                            perfect_shots.append(dot)     #точки контура добавляются в список не разрешенных для выстрела клеток. то есть в список произведенных выстрелов, чтобы игрок по ним уже не мог стрелять
-                            print('Корабль потоплен!') 
-                    return perfect_shots
-                else:    #если выстрел НЕ ПОПАДАЕТ в одну из точек корабля
-                    if dot in self.out(dot):    #если выстрел ВЫШЕЛ за пределы поля
-                        raise Exception("Введите корректные данные для выстрела!")
-                    else:    #если выстрел НЕ ВЫШЕЛ за пределы поля (но он не попал в корабль, то есть промах)
-                        self.field[dot.x - 1][dot.y - 1] = 'T'    #точка помечается знаком 'X'
-                        perfect_shots.append(dot)
-                        print('Промах!')
-                    return perfect_shots
+                    if ship.hp == 0:  # если корабль погибает
+                        for dot in self.contour(ship):
+                            self.field[dot.x - 1][dot.y - 1] = 'T'
+                        self.num_sur -= 1
+                        self.list_ships.remove(ship)
+                        print('Корабль потоплен!')
+            else:
+                if self.field[dot.x - 1][dot.y - 1] == '0':
+                    self.field[dot.x - 1][dot.y - 1] = 'T'
+                    print('Промах!')
+                    return False
 
     def print_board(self):
         print(" |1|2|3|4|5|6")
         for i, row in enumerate(self.field, start=1):
             print(i, *row, sep='|')
+
+
+
+class Player:
+    def __init__(self, own, enemy_board):
+        self.own = own
+        self.enemy_board = enemy_board
+
+    def name(self):
+        pass
+
+    def ask(self, dot):
+        print(f'Ход игрока {self.name()}')
+        pass
+
+    def move(self, dot):
+        dot = self.ask(dot)
+        try:
+            shot = self.enemy_board.shot(dot)
+            self.enemy_board.print_board()
+            return shot
+        except Exception as ex:
+            print(ex)
+            return True
+
+
+
+class User(Player):
+    def ask(self, dot):
+        dot = Dot(int(input('Введите номер строки:')), int(input('Введите номер столбца:')))
+        return dot
+
+    def name(self):
+        return 'Пользователь'
+
+
+
+class AI(Player):
+    def ask(self, dot):
+        dot = Dot(random.randint(1, 6), random.randint(1, 6))
+        return dot
+
+    def name(self):
+        return 'Компьютер'
+
+
+
+class Game:
+    def __init__(self):
+        user_board = self.random_board()
+        ai_board = self.random_board()
+        self.user_board = user_board
+        self.ai_board = ai_board
+        self.user = User(user_board, ai_board)
+        self.ai = AI(ai_board, user_board)
+
+
+
+    def greet(self):
+        print('Добро пожаловать в игру морской бой 6х6!')
+
+    def loop(self):
+        while True:
+            if self.user_board.list_ships == 0:
+                print('Поражение:( Компьютер победил:(')
+                return
+            if not self.ai.move:
+                break
+        while True:
+            if self.ai_board.list_ships == 0:
+                print('Поздравляем! Вы победили!:)')
+                return
+            if not self.user.move:
+                break
+
+
+    def random_board(self):
+        board = Board(False)
+        size = [3, 2, 2, 1, 1, 1, 1]
+        for i in size:
+            x = random.randint(1, 6)
+            y = random.randint(1, 6)
+            direction = random.choice(['H', 'V'])     #горизонтальное и вертикальное
+            ship = Ship(i, Dot(x, y), direction)
+            board.list_ships.append(ship)
+            board.num_sur += 1
+            if board.add_ship(ship):
+                continue
+        return board
+
+    def start(self):
+        self.greet()
+        print('Ваша доска!')
+        self.user_board.print_board()
+        self.loop()
+        print('Игра окончена!')
+
+if __name__ == '__main__':
+    game = Game()
+    game.start()
