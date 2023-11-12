@@ -21,7 +21,7 @@ class Ship:
     def dots(self):
         ship_dots = []
         for i in range(self.size):
-            if self.direction == 'H':       # horizontally
+            if self.direction == 0:       # horizontally
                 dot_ship = Dot(self.nose.x + i, self.nose.y)
             else:
                 dot_ship = Dot(self.nose.x, self.nose.y + i)
@@ -45,7 +45,7 @@ class Board():
         for dot in ship.dots:
             self.field[dot.x - 1][dot.y - 1] = '■'
         self.occupied_points.append(ship.dots)
-        self.occupied_points.append(self.contour(ship))
+        self.occupied_points.extend(self.contour(ship))
         self.list_ships.append(ship)
         self.num_sur += 1
         return self.list_ships, self.num_sur, self.field
@@ -53,8 +53,8 @@ class Board():
     def contour(self, ship):
         contour_ship = []
         for dot in ship.dots:
-            for i in range(-1, 1):
-                for j in range(-1, 1):
+            for i in range(-1, 2):
+                for j in range(-1, 2):
                     contour_dot = Dot(dot.x + i, dot.y + j)
                     if self.out(contour_dot) or contour_dot in ship.dots:
                         continue
@@ -94,25 +94,24 @@ class Board():
             print(i, *row, sep='|')
 
 
-
 class Player:
     def __init__(self, own, enemy_board):
         self.own = own
         self.enemy_board = enemy_board
 
-    def name(self):
+
+
+    def ask(self):
         pass
 
-    def ask(self, dot):
-        print(f'Ход игрока {self.name()}')
-        pass
-
-    def move(self, dot):
-        dot = self.ask(dot)
+    def move(self):
         try:
-            shot = self.enemy_board.shot(dot)
+            self.enemy_board.shot(self.ask())
             self.enemy_board.print_board()
-            return shot
+            if self.enemy_board.shot(self.ask()) is False:
+                return False
+            else:
+                return True
         except Exception as ex:
             print(ex)
             return True
@@ -120,8 +119,11 @@ class Player:
 
 
 class User(Player):
-    def ask(self, dot):
-        dot = Dot(int(input('Введите номер строки:')), int(input('Введите номер столбца:')))
+    def ask(self):
+        print(f'Ход игрока {self.name()}')
+        x = int(input('Введите номер строки:'))
+        y = int(input('Введите номер столбца:'))
+        dot = Dot(x, y)
         return dot
 
     def name(self):
@@ -130,8 +132,11 @@ class User(Player):
 
 
 class AI(Player):
-    def ask(self, dot):
-        dot = Dot(random.randint(1, 6), random.randint(1, 6))
+    def ask(self):
+        print(f'Ход игрока {self.name()}')
+        x = random.randint(1, 6)
+        y = random.randint(1, 6)
+        dot = Dot(x, y)
         return dot
 
     def name(self):
@@ -141,49 +146,54 @@ class AI(Player):
 
 class Game:
     def __init__(self):
-        user_board = self.random_board()
-        ai_board = self.random_board()
-        self.user_board = user_board
-        self.ai_board = ai_board
-        self.user = User(user_board, ai_board)
-        self.ai = AI(ai_board, user_board)
-
-
+        self.user_board = self.random_board(False)
+        self.ai_board = self.random_board(True)
+        self.user = User(self.user_board, self.ai_board)
+        self.ai = AI(self.ai_board, self.user_board)
 
     def greet(self):
         print('Добро пожаловать в игру морской бой 6х6!')
 
     def loop(self):
-        while True:
-            if self.user_board.list_ships == 0:
-                print('Поражение:( Компьютер победил:(')
+        count = 0
+        if count % 2 == 0:
+            self.user.move()
+            if self.user.move() is False:
+                count += 1
+                if self.ai_board.list_ships == 0:
+                    print("Вы победили!")
+            else:
                 return
-            if not self.ai.move():
-                break
-        while True:
-            if self.ai_board.list_ships == 0:
-                print('Поздравляем! Вы победили!:)')
+        else:
+            self.ai.move()
+            if self.ai.move() is False:
+                count += 1
+                if self.user_board.list_ships == 0:
+                    print("Компьютер победил!")
+            else:
                 return
-            if not self.user.move():
-                break
 
 
-    def random_board(self):
-        board = Board(False)
+
+
+    def random_board(self, hid):
+        board = Board(hid)
         size = [3, 2, 2, 1, 1, 1, 1]
         count = 0
-        if count < 1000:
-            for i in size:
-                x = random.randint(1, 6)
-                y = random.randint(1, 6)
-                direction = random.choice(['H', 'V'])     #горизонтальное и вертикальное
-                ship = Ship(i, Dot(x, y), direction)
+        for i in size:
+            while True:
                 try:
+                    x = random.randint(1, 6)
+                    y = random.randint(1, 6)
+                    direction = random.randint(0, 1)     #горизонтальное и вертикальное
+                    ship = Ship(i, Dot(x, y), direction)
                     board.add_ship(ship)
-                except:
-                    print("Невозможно поставить корабль на это место!")
                     count += 1
                     continue
+                except Exception:
+                    pass
+            if count > 1000:
+                raise Exception('превышено допустимое количество попыток')
         return board
 
 
@@ -194,9 +204,9 @@ class Game:
         self.loop()
         print('Игра окончена!')
 
-if __name__ == '__main__':
-    game = Game()
-    game.start()
+
+game = Game()
+game.start()
 
 
 
