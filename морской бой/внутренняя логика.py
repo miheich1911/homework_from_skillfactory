@@ -1,5 +1,5 @@
 import random
-import re
+
 class Dot:
     def __init__(self, x, y):
 
@@ -92,19 +92,16 @@ class Board():
                         return False
 
     def print_board(self):
-        if self.hid:
-            # ai_field = self.field
-            for i in range(len(self.field)):
-                for j in range(len(self.field[i])):
-                    if self.field[i][j] == '■':
-                        self.field[i][j] = '0'
-            print(" |1|2|3|4|5|6")
-            for i, row in enumerate(self.field, start=1):
-                print(i, *row, sep='|')
-        else:
-            print(" |1|2|3|4|5|6")
-            for i, row in enumerate(self.field, start=1):
-                print(i, *row, sep='|')
+        print(" |1|2|3|4|5|6|")
+        for i in range(len(self.field)):
+            print(f'{i + 1}', end='|')
+            for j in range(len(self.field[i])):
+                if self.hid and self.field[i][j] == '■':
+                    print('0', end='|')
+                else:
+                    print(self.field[i][j], end='|')
+            print()
+
 
 
 class Player:
@@ -118,7 +115,6 @@ class Player:
     def move(self):
         try:
             shot = self.enemy_board.shot(self.ask())
-            # 6
             return shot
         except Exception as ex:
             print(ex)
@@ -135,9 +131,6 @@ class AI(Player):
         print('Ход ИИ:')
         dot = Dot(random.randint(1, 6), random.randint(1, 6))
         return dot
-
-
-
 
 class Game:
     def __init__(self):
@@ -175,22 +168,29 @@ class Game:
         board = Board(hid)
         size = [3, 2, 2, 1, 1, 1, 1]
         count = 0
-        if count > 1000:
-            raise Exception('превышено допустимое количество попыток')
-        else:
-            for i in size:
-                while True:
-                    try:
-                        x = random.randint(1, len(board.field))
-                        y = random.randint(1, len(board.field))
-                        direction = random.randint(0, 1)  # горизонтальное и вертикальное
-                        ship = Ship(i, Dot(x, y), direction)
-                        board.add_ship(ship)
+        added_ships = 0
+        while added_ships < len(size):
+            while True:
+                if count == 1000:
+                    print('Превышено допустимое количество попыток!')
+                    count = 0
+                    board = Board(hid)
+                    added_ships = 0
+                    break
+                x = random.randint(1, len(board.field))
+                y = random.randint(1, len(board.field))
+                direction = random.randint(0, 1)
+                ship = Ship(size[added_ships], Dot(x, y), direction)
+                try:
+                    if board.add_ship(ship):
+                        added_ships += 1
                         break
-                    except Exception:
-                        count += 1
+                except Exception:
+                    count += 1
+                    continue
         return board
-        
+
+
 
 
     def start(self):
@@ -199,7 +199,6 @@ class Game:
         self.user_board.print_board()
         self.loop()
         print('Игра окончена!')
-        # print(repr(self.user_board.list_ships))
 game = Game()
 game.start()
 
