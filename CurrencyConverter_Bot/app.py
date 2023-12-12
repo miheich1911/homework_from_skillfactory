@@ -37,13 +37,6 @@ def convert(message: telebot.types.Message):
     except Exception as e:
         bot.reply_to(message, f'Не удалось обработать команду\n{e}')
     else:
-        # if base == 'рубль':
-        #     text = f'Цена {amount} {quote}  - {total_base} рублей'
-        #
-        # elif base == 'евро':
-        #     text = f'Цена {amount} {quote}  - {total_base} {base}'
-        #
-        # elif base == 'доллар':
         text = f'Цена {amount} {quote}  - {total_base} {base}'
         bot.send_message(message.chat.id, text)
 
